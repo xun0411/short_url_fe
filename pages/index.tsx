@@ -22,19 +22,19 @@ import isUrl from 'is-url';
 
 import { Layout } from '../src/components/layout';
 import { NextChakraLink } from '../src/components/NextChakraLink';
+import { LoadType } from '../src/@types/Response.types';
 
 import type { AxiosResponse } from 'axios';
 import type { NextPage } from 'next';
-import { LoadType, type ResultData } from '../src/@types/Response.types';
+import type { ResultData } from '../src/@types/Response.types';
 
 
 interface UrlData {
-    id?: number;
-    user_id: number;                    //引用使用者的id    (INT)
-    long_url: string;                   //原始網址          string(1000)
-    // created_at: string;              //添加時間          Date
-    expire_date: number | null;         //過期時間(分)      (INT_UNSIGNED)
-    password: string | null;            //密碼              string(128)
+    user_id: number | null;             // 引用使用者的id    (INT)
+    long_url: string;                   // 原始網址          string(1000)
+    // created_at: string;              // 添加時間          Date
+    expire_date: number | null;         // 過期時間(分)      (INT_UNSIGNED)
+    password: string | null;            // 密碼              string(128)
 }
 
 export async function getStaticProps() {
@@ -63,7 +63,7 @@ const Home: NextPage = () => {
         setLoading(true);
         //------------------------------------------//
         const sendData: UrlData = {
-            user_id: 1,
+            user_id: null,
             long_url: longUrl,
             expire_date: null,
             password: null
@@ -77,8 +77,10 @@ const Home: NextPage = () => {
 
 
         if (res.data.loadType == LoadType.SUCCEED) {
-            // setShortUrl((res.data.data[0] as any).short_url);
-            setShortUrl('http://localhost:3000/dst3wE');
+            setShortUrl(`${process.env.NEXT_PUBLIC_URL_HOST + (res.data.data[0] as any).short_url}`);
+        }
+        else if (res.data.loadType == LoadType.DATA_EXISTED) {
+            setShortUrl(`${process.env.NEXT_PUBLIC_URL_HOST + (res.data.data[0] as any).short_url}`);
         }
         else {
             toast({
